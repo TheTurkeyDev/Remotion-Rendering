@@ -4,6 +4,7 @@
   "description": "",
   "main": "out/render.js",
   "scripts": {
+    "build": "npx tsc",
     "run": "npx tsc & node -r dotenv/config out/rest.js"
   },
   "author": "TurkeyDev",
