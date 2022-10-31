@@ -9,4 +9,4 @@ RUN npm install --production
 
 COPY output/. ./
 
-CMD [ "node", "render.js" ]
+CMD [ "node", "rest.js" ]
