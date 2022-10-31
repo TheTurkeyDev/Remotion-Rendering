@@ -2,7 +2,7 @@
   "name": "remotion-rendering",
   "version": "1.0.0",
   "description": "",
-  "main": "out/render.js",
+  "main": "output/render.js",
   "scripts": {
     "build": "npx tsc",
     "run": "npx tsc & node -r dotenv/config out/rest.js"
