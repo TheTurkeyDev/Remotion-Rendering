@@ -49,7 +49,7 @@ async function deleteTemp() {
 }
 
 app.get('/output/:id', async (req, res) => {
-    res.download(`./output/${req.params.id}`, err => { if (!!err) res.sendStatus(404); });
+    res.download(`${process.env.OUTPUT_FOLDER}/${req.params.id}`, err => { if (!!err) res.sendStatus(404); });
 });
 
 app.listen(port, () => {
