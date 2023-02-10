@@ -6,7 +6,6 @@ import { RenderStatus } from './render-status';
 
 export const render = async (id: string, compId: string, entry: string, inputProps: object | null) => {
     const db = getDB();
-    db.prepare('INSERT INTO videos (id, status, progress, error) VALUES (?, ?, ?, ?);').run(id, RenderStatus.NOT_STARTED, 0, '');
     console.log('Creating a Webpack bundle of the video');
     const bundleLocation = await bundle(path.resolve(entry), () => undefined, {
         // If you have a Webpack override, make sure to add it here

@@ -4,6 +4,7 @@ import fs from 'fs';
 import { render } from './render';
 import cors from 'cors';
 import Database from 'better-sqlite3';
+import { RenderStatus } from './render-status';
 
 const db = new Database('/data/videos.db');
 db.pragma('journal_mode = WAL');
@@ -38,15 +39,22 @@ app.post('/render', async (req, res) => {
     }
 
     const id = randomUID();
+    db.prepare('INSERT INTO videos (id, status, progress, error) VALUES (?, ?, ?, ?);').run(id, RenderStatus.NOT_STARTED, 0, '');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.status(200).send({ id, format: 'mp4' });
     await deleteTemp();
-    execSync(`git clone ${body.git} temp`, { encoding: 'utf-8' });
-    console.log('npm install...');
-    execSync('npm i', { cwd: './temp', encoding: 'utf-8' });
-    await render(id, body.compositionId, body.entry, { directives: body.directives });
+    try {
+        execSync('whoami', { encoding: 'utf-8' });
+        execSync(`git clone ${body.git} temp`, { encoding: 'utf-8' });
+        console.log('npm install...');
+        execSync('npm i', { cwd: './temp', encoding: 'utf-8' });
+        await render(id, body.compositionId, body.entry, { directives: body.directives });
+    } catch (e) {
+        db.prepare('UPDATE videos SET status=?, error=? WHERE id=?;').run(RenderStatus.ERRORED, e, id);
+    }
     await deleteTemp();
 });
+
 
 async function deleteTemp() {
     const dir = './temp';
