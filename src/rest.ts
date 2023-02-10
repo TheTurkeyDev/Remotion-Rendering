@@ -3,6 +3,14 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import { render } from './render';
 import cors from 'cors';
+import Database from 'better-sqlite3';
+
+const db = new Database('data/videos.db');
+db.pragma('journal_mode = WAL');
+db.prepare('CREATE TABLE IF NOT EXISTS videos (id TEXT PRIMARY KEY, status INTEGER, progress INTEGER, error TEXT);').run();
+
+export const getDB = () => db;
+
 const app = express();
 app.use(express.json());
 app.use(cors({ credentials: true, origin: true }));
@@ -47,6 +55,16 @@ async function deleteTemp() {
         fs.rmSync(dir, { recursive: true });
     console.log(`${dir} is deleted!`);
 }
+
+app.get('/status/:id', async (req, res) => {
+    const id = req.params.id;
+    const vid = db.prepare('SELECT * videos WHERE id=?').get(id);
+    if (!vid) {
+        res.status(404);
+        return;
+    }
+    res.status(200).json(JSON.stringify(vid));
+});
 
 app.get('/output/:id', async (req, res) => {
     res.download(`${process.env.OUTPUT_FOLDER}/${req.params.id}`, err => { if (!!err) res.sendStatus(404); });

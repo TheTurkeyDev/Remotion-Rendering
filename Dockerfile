@@ -5,8 +5,8 @@ WORKDIR /app
 
 COPY ["package.json", "package-lock.json*", "./"]
 
+RUN apt update
 RUN apt install git
-
 RUN npm install --production
 
 COPY output/. ./
