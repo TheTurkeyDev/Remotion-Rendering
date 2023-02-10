@@ -20,9 +20,9 @@
     "eslint-plugin-functional": "^5.0.4"
   },
   "dependencies": {
-    "@remotion/bundler": "^3.3.39",
-    "@remotion/renderer": "^3.3.39",
-    "better-sqlite3": "^8.0.1",
+    "@remotion/bundler": "^3.3.42",
+    "@remotion/renderer": "^3.3.42",
+    "better-sqlite3": "^8.1.0",
     "cors": "^2.8.5",
     "express": "^4.18.2"
   }

@@ -5,9 +5,7 @@ import { render } from './render';
 import cors from 'cors';
 import Database from 'better-sqlite3';
 
-const prodPath = '/data/videos.db';
-const filePath = fs.existsSync(prodPath) ? prodPath : 'data/videos.db';
-const db = new Database(filePath);
+const db = new Database('/data/videos.db');
 db.pragma('journal_mode = WAL');
 db.prepare('CREATE TABLE IF NOT EXISTS videos (id TEXT PRIMARY KEY, status INTEGER, progress INTEGER, error TEXT);').run();
 
