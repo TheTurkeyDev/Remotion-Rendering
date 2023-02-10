@@ -50,7 +50,7 @@ app.post('/render', async (req, res) => {
         execSync('npm i', { cwd: './temp', encoding: 'utf-8' });
         await render(id, body.compositionId, body.entry, { directives: body.directives });
     } catch (e) {
-        db.prepare('UPDATE videos SET status=?, error=? WHERE id=?;').run(RenderStatus.ERRORED, e, id);
+        db.prepare('UPDATE videos SET status=?, error=? WHERE id=?;').run(RenderStatus.ERRORED, JSON.stringify(e), id);
     }
     await deleteTemp();
 });
