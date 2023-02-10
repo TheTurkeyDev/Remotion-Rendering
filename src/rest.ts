@@ -44,7 +44,7 @@ app.post('/render', async (req, res) => {
     res.status(200).send({ id, format: 'mp4' });
     await deleteTemp();
     try {
-        execSync('whoami', { encoding: 'utf-8' });
+        console.log(execSync('whoami', { encoding: 'utf-8' }));
         execSync(`git clone ${body.git} temp`, { encoding: 'utf-8' });
         console.log('npm install...');
         execSync('npm i', { cwd: './temp', encoding: 'utf-8' });
@@ -71,7 +71,7 @@ app.get('/status/:id', async (req, res) => {
         res.status(404).send();
         return;
     }
-    res.status(200).json(JSON.stringify(vid));
+    res.status(200).json(vid);
 });
 
 app.get('/output/:id', async (req, res) => {
