@@ -6,7 +6,7 @@ import { RenderStatus } from './render-status';
 
 export const render = async (id: string, compId: string, entry: string, inputProps: object | null) => {
     const db = getDB();
-    db.prepare('INSERT INTO videos (id, status, progress, error) VALUES (?, ?, ?, ?)').run(id, RenderStatus.NOT_STARTED, 0, '');
+    db.prepare('INSERT INTO videos (id, status, progress, error) VALUES (?, ?, ?, ?);').run(id, RenderStatus.NOT_STARTED, 0, '');
     console.log('Creating a Webpack bundle of the video');
     const bundleLocation = await bundle(path.resolve(entry), () => undefined, {
         // If you have a Webpack override, make sure to add it here
@@ -28,12 +28,12 @@ export const render = async (id: string, compId: string, entry: string, inputPro
     // Ensure the composition exists
     if (!composition) {
         const error = `No composition with the ID ${compId} found. Review "${entry}" for the correct ID.`;
-        db.prepare('UPDATE videos SET status=?, error=? WHERE id=?').run(RenderStatus.ERRORED, error, id);
+        db.prepare('UPDATE videos SET status=?, error=? WHERE id=?;').run(RenderStatus.ERRORED, error, id);
         throw new Error(error);
     }
 
     const outputLocation = `${process.env.OUTPUT_FOLDER ?? ''}/${id}.mp4`;
-    db.prepare('UPDATE videos SET status=? WHERE id=?').run(RenderStatus.RENDERING, id);
+    db.prepare('UPDATE videos SET status=? WHERE id=?;').run(RenderStatus.RENDERING, id);
     console.log('Attempting to render:', outputLocation);
 
     await renderMedia({
@@ -43,7 +43,7 @@ export const render = async (id: string, compId: string, entry: string, inputPro
         inputProps,
         codec: 'h264',
         onProgress: ({ progress }) => {
-            db.prepare('UPDATE videos SET progress=? WHERE id=?').run(progress, id);
+            db.prepare('UPDATE videos SET progress=? WHERE id=?;').run(progress, id);
             console.log(`Rendering is ${progress * 100}% complete`);
         },
         // codec: 'prores',
@@ -51,6 +51,6 @@ export const render = async (id: string, compId: string, entry: string, inputPro
         // imageFormat: 'png',
         // pixelFormat: 'yuva444p10le', These are for video with alpha
     });
-    db.prepare('UPDATE videos SET status=? WHERE id=?').run(RenderStatus.COMPLETE, id);
+    db.prepare('UPDATE videos SET status=? WHERE id=?;').run(RenderStatus.COMPLETE, id);
     console.log('Render done!');
 };

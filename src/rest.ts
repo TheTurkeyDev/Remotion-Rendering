@@ -58,9 +58,9 @@ async function deleteTemp() {
 
 app.get('/status/:id', async (req, res) => {
     const id = req.params.id;
-    const vid = db.prepare('SELECT * videos WHERE id=?').get(id);
+    const vid = db.prepare('SELECT * FROM videos WHERE id=?;').get(id);
     if (!vid) {
-        res.status(404);
+        res.status(404).send();
         return;
     }
     res.status(200).json(JSON.stringify(vid));
