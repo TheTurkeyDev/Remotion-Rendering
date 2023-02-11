@@ -6,7 +6,7 @@ WORKDIR /app
 COPY ["package.json", "package-lock.json*", "./"]
 
 RUN apt update -y
-RUN apt install git ffmpeg ffprobe -y
+RUN apt install git ffmpeg -y
 RUN npm install --omit=dev
 
 COPY output/. ./
