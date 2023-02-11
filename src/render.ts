@@ -11,7 +11,7 @@ export const render = async (id: string, compId: string, entry: string, inputPro
         // If you have a Webpack override, make sure to add it here
         webpackOverride: config => config,
     });
-    
+
     // Extract all the compositions you have defined in your project
     // from the webpack bundle.
     const comps = await getCompositions(bundleLocation, {
@@ -21,15 +21,18 @@ export const render = async (id: string, compId: string, entry: string, inputPro
         inputProps,
     }).catch(e => {
         db.prepare('UPDATE videos SET status=?, error=? WHERE id=?;').run(RenderStatus.ERRORED, JSON.stringify(e), id);
-        return [];
+        return null;
     });
+
+    if (!comps)
+        return;
 
     // Select the composition you want to render.
     const composition = comps.find(c => c.id === compId);
 
     // Ensure the composition exists
     if (!composition) {
-        const error = `No composition with the ID ${compId} found. Review "${entry}" for the correct ID.`;
+        const error = `No composition with the ID ${compId} found. Available compositions: ${comps.map(c => c.id)}.`;
         db.prepare('UPDATE videos SET status=?, error=? WHERE id=?;').run(RenderStatus.ERRORED, error, id);
         return;
     }
