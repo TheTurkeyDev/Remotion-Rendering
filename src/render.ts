@@ -11,7 +11,7 @@ export const render = async (id: string, compId: string, entry: string, inputPro
         // If you have a Webpack override, make sure to add it here
         webpackOverride: config => config,
     });
-
+    
     // Extract all the compositions you have defined in your project
     // from the webpack bundle.
     const comps = await getCompositions(bundleLocation, {
@@ -19,6 +19,9 @@ export const render = async (id: string, compId: string, entry: string, inputPro
         // in the composition list. Use this if you want to dynamically set the duration or
         // dimensions of the video.
         inputProps,
+    }).catch(e => {
+        db.prepare('UPDATE videos SET status=?, error=? WHERE id=?;').run(RenderStatus.ERRORED, JSON.stringify(e), id);
+        return [];
     });
 
     // Select the composition you want to render.
@@ -43,7 +46,6 @@ export const render = async (id: string, compId: string, entry: string, inputPro
         codec: 'h264',
         onProgress: ({ progress }) => {
             db.prepare('UPDATE videos SET progress=? WHERE id=?;').run(progress, id);
-            console.log(`Rendering is ${progress * 100}% complete`);
         },
         // codec: 'prores',
         // proResProfile: '4444',
