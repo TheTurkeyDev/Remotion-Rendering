@@ -28,7 +28,7 @@ export const render = async (id: string, compId: string, entry: string, inputPro
     if (!composition) {
         const error = `No composition with the ID ${compId} found. Review "${entry}" for the correct ID.`;
         db.prepare('UPDATE videos SET status=?, error=? WHERE id=?;').run(RenderStatus.ERRORED, error, id);
-        throw new Error(error);
+        return;
     }
 
     const outputLocation = `${process.env.OUTPUT_FOLDER ?? ''}/${id}.mp4`;
