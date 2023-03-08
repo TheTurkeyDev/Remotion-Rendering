@@ -21,11 +21,14 @@ export const render = async (id: string, compId: string, entry: string, inputPro
         inputProps,
     }).catch(e => {
         db.prepare('UPDATE videos SET status=?, error=? WHERE id=?;').run(RenderStatus.ERRORED, JSON.stringify(e), id);
+        console.log(`Error getting compositions ${e}`);
         return null;
     });
 
-    if (!comps)
+    if (!comps){
+        console.log('Compositions was null!');
         return;
+    }
 
     // Select the composition you want to render.
     const composition = comps.find(c => c.id === compId);
