@@ -6,12 +6,13 @@ import { RenderStatus } from './render-status';
 
 export const render = async (id: string, compId: string, entry: string, inputProps: object | null) => {
     const db = getDB();
-    console.log('Creating a Webpack bundle of the video');
+    console.log('Creating a Webpack bundle of the video...');
     const bundleLocation = await bundle(path.resolve(entry), () => undefined, {
         // If you have a Webpack override, make sure to add it here
         webpackOverride: config => config,
     });
 
+    console.log('Getting compositions...');
     // Extract all the compositions you have defined in your project
     // from the webpack bundle.
     const comps = await getCompositions(bundleLocation, {
@@ -36,6 +37,7 @@ export const render = async (id: string, compId: string, entry: string, inputPro
     // Ensure the composition exists
     if (!composition) {
         const error = `No composition with the ID ${compId} found. Available compositions: ${comps.map(c => c.id)}.`;
+        console.log(error);
         db.prepare('UPDATE videos SET status=?, error=? WHERE id=?;').run(RenderStatus.ERRORED, error, id);
         return;
     }
@@ -50,6 +52,7 @@ export const render = async (id: string, compId: string, entry: string, inputPro
         outputLocation,
         inputProps,
         codec: 'h264',
+        muted: true,
         onProgress: ({ progress }) => {
             db.prepare('UPDATE videos SET progress=? WHERE id=?;').run(progress, id);
         },

@@ -22,7 +22,9 @@ type RenderBody = {
     readonly compositionId: string
     readonly entry: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    readonly directives: readonly any[]
+    readonly directives?: readonly any[]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    readonly scoreboard?: any,
 }
 
 app.post('/render', async (req, res) => {
@@ -33,7 +35,7 @@ app.post('/render', async (req, res) => {
     }
     const body = req.body as RenderBody;
 
-    if (!body.git || !body.compositionId || !body.entry || (body.directives ?? []).length === 0) {
+    if (!body.git || !body.compositionId || !body.entry) {
         res.sendStatus(400);
         return;
     }
@@ -44,13 +46,13 @@ app.post('/render', async (req, res) => {
     res.status(200).send({ id, format: 'mp4' });
     await deleteTemp();
     try {
-        console.log(execSync('whoami', { encoding: 'utf-8' }));
         execSync(`git clone ${body.git} temp`, { encoding: 'utf-8' });
         console.log('npm install...');
         execSync('npm i', { cwd: './temp', encoding: 'utf-8' });
-        await render(id, body.compositionId, body.entry, { directives: body.directives });
+        await render(id, body.compositionId, body.entry, { ...body });
     } catch (e) {
-        db.prepare('UPDATE videos SET status=?, error=? WHERE id=?;').run(RenderStatus.ERRORED, JSON.stringify(e), id);
+        console.error(e);
+        db.prepare('UPDATE videos SET status=?, error=? WHERE id=?;').run(RenderStatus.ERRORED, e, id);
     }
     await deleteTemp();
 });
